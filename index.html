@@ -295,6 +295,7 @@ function renderList(){
       <h3>${escapeHtml(p.nama_projek||'(Tiada nama)')}</h3>
       <div class="sekolah">${escapeHtml(p.nama_sekolah||'')} ${p.kod_sekolah?('· '+p.kod_sekolah):''}</div>
       <div class="baris-badge">
+        ${S.me.peranan==='Admin JPN'?badge(namaPPD(p.ppd)||p.ppd,'info'):''}
         ${badge(p.status||'Draf',warnaStatus(p.status))}
         ${p.keputusan_terkini?badge(p.keputusan_terkini,warnaKeputusan(p.keputusan_terkini)):''}
         ${p.tahun?badge(p.tahun,'grey'):''}
@@ -330,8 +331,14 @@ function tutupPanel(){el('#panel').style.display='none';S.edit=null;}
 
 function borangProjek(p){
   const opt=(arr,v)=>['<option value="">— Pilih —</option>'].concat(arr.map(o=>`<option ${o===v?'selected':''}>${o}</option>`)).join('');
+  const ppdField = S.me.peranan==='Admin JPN'
+    ? (p.kod_projek
+        ? `<div class="medan"><label>PPD</label><input value="${attr(namaPPD(p.ppd))}" disabled></div>`
+        : `<div class="medan"><label>PPD sasaran *</label><select id="f-ppd">${['<option value="">— Pilih PPD —</option>'].concat(S.ppd.map(pp=>`<option value="${pp.kod}">${escapeHtml(pp.nama)}</option>`)).join('')}</select></div>`)
+    : '';
   return `<div class="seksyen">
     <div class="seksyen-tajuk">Maklumat projek</div>
+    ${ppdField}
     <div class="medan"><label>Nama projek *</label><input id="f-nama_projek" value="${attr(p.nama_projek)}"></div>
     <div class="dua">
       <div class="medan"><label>Kod sekolah *</label><input id="f-kod_sekolah" value="${attr(p.kod_sekolah)}"></div>
@@ -421,6 +428,10 @@ async function simpanDraf(){
     anggaran_kos:val('f-anggaran_kos'), tahun:val('f-tahun')
   };
   if(!data.nama_projek||!data.kod_sekolah||!data.nama_sekolah){toast('Sila isi Nama projek, Kod & Nama sekolah.',true);return;}
+  if(S.me.peranan==='Admin JPN' && !p.kod_projek){
+    data.ppd=val('f-ppd');
+    if(!data.ppd){toast('Sila pilih PPD sasaran projek.',true);return;}
+  }
   try{
     if(p.kod_projek){await api('kemaskiniProjek',{kodProjek:p.kod_projek,data});toast('Perubahan disimpan.');}
     else{const d=await api('ciptaProjek',{data});p.kod_projek=d.kodProjek;Object.assign(p,data);toast('Draf disimpan: '+d.kodProjek);}
@@ -482,6 +493,7 @@ function val(id){const e=document.getElementById(id);return e?e.value.trim():'';
 function attr(v){return v==null?'':String(v).replace(/"/g,'&quot;');}
 function escapeHtml(s){return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 function extractId(url){if(!url)return'';const m=String(url).match(/[-\w]{25,}/);return m?m[0]:'';}
+function namaPPD(kod){const x=S.ppd.find(p=>p.kod===kod);return x?x.nama:(kod||'');}
 
 /* ============================ AUTO LOG MASUK ============================ */
 window.addEventListener('load',async()=>{
