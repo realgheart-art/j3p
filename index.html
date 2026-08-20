@@ -8,6 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
 <style>
   :root{
     --navy:#0F2942; --navy-2:#1B3A5B; --brass:#B8860B; --brass-2:#8f6a08;
@@ -126,6 +128,66 @@
   .spinner{width:38px;height:38px;border:4px solid var(--line);border-top-color:var(--brass);border-radius:50%;animation:spin .7s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
   .hint{font-size:12.5px;color:var(--muted);margin-top:5px}
+
+  /* ---------- AKSI BAR (Fasa 3) ---------- */
+  .aksi-bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .jpn-only{display:none}
+  .kad-pilih{position:absolute;top:12px;right:12px;width:22px;height:22px;accent-color:var(--brass);cursor:pointer}
+  .kad{position:relative}
+
+  /* ---------- MOD PEMBENTANGAN ---------- */
+  #bentang{position:fixed;inset:0;z-index:150;background:var(--navy);color:#fff;display:none;flex-direction:column}
+  .bt-head{display:flex;align-items:center;gap:14px;padding:14px 24px;border-bottom:2px solid var(--brass);background:#0b2035}
+  .bt-head .wm{font-family:'Fraunces',serif;font-size:24px;font-weight:700}
+  .bt-head .ppd-tag{font-size:12px;letter-spacing:1px;text-transform:uppercase;opacity:.8}
+  .bt-head .mesyuarat{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .bt-head input{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;padding:7px 11px;border-radius:8px;font-size:13px}
+  .bt-head input::placeholder{color:rgba(255,255,255,.55)}
+  .bt-x{color:#fff;font-size:26px;width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+  .bt-x:hover{background:rgba(255,255,255,.15)}
+  .bt-badan{flex:1;overflow-y:auto;padding:28px 24px;display:flex;justify-content:center}
+  .bt-kad{width:100%;max-width:920px}
+  .bt-kod{font-size:14px;font-weight:700;color:var(--brass);letter-spacing:.6px}
+  .bt-nama{font-family:'Fraunces',serif;font-size:32px;font-weight:600;margin:4px 0 6px;line-height:1.15}
+  .bt-sekolah{font-size:16px;opacity:.85;margin-bottom:20px}
+  .bt-kotak{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:20px 22px;margin-bottom:16px}
+  .bt-kotak h4{font-family:'Fraunces',serif;font-size:15px;font-weight:600;color:var(--brass);margin-bottom:14px;text-transform:none}
+  .bt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 26px}
+  @media(max-width:640px){.bt-grid{grid-template-columns:1fr}}
+  .bt-info{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:14.5px}
+  .bt-info .k{opacity:.7}.bt-info .v{font-weight:600;text-align:right}
+  .bt-dok{display:flex;gap:10px;flex-wrap:wrap}
+  .bt-dok .btn{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.25)}
+  .bt-dok .btn:hover{background:rgba(255,255,255,.2)}
+  .bt-dok .btn.tiada{opacity:.4;pointer-events:none}
+  .bt-ulasan{width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:10px;padding:12px;font-size:14.5px;min-height:80px;resize:vertical}
+  .bt-kep{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0}
+  .bt-kep button{padding:10px 16px;border-radius:9px;font-weight:600;font-size:14px;border:2px solid rgba(255,255,255,.3);background:transparent;color:#fff;transition:.15s}
+  .bt-kep button:hover{border-color:#fff}
+  .bt-kep button.pilih{background:var(--brass);border-color:var(--brass)}
+  .bt-syarat-input{width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:9px 11px;font-size:14px;margin-bottom:8px}
+  .bt-nav{display:flex;align-items:center;gap:14px;padding:14px 24px;border-top:1px solid rgba(255,255,255,.15);background:#0b2035}
+  .bt-nav .kira{font-size:14px;opacity:.85}
+  .bt-nav .tolak{margin-left:auto;display:flex;gap:10px}
+  .bt-nav button{padding:10px 18px;border-radius:9px;font-weight:600;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25)}
+  .bt-nav button:hover{background:rgba(255,255,255,.22)}
+  .bt-nav button:disabled{opacity:.35;pointer-events:none}
+  .bt-pilih-ppd{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:20px;text-align:center}
+  .bt-pilih-ppd .grid-ppd{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;max-width:720px;width:100%}
+  .bt-pilih-ppd .grid-ppd button{padding:16px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff;font-weight:600;font-size:15px;transition:.15s}
+  .bt-pilih-ppd .grid-ppd button:hover{background:var(--brass);border-color:var(--brass)}
+  .bt-badge{font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;background:rgba(255,255,255,.15);color:#fff}
+
+  /* ---------- PANEL TETAPAN ---------- */
+  #tetapan{position:fixed;inset:0;z-index:120;background:rgba(15,41,66,.45);display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:24px 16px}
+  .item-baris{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f2f1ea}
+  .item-baris input{flex:1;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px}
+  .item-baris .buang{color:var(--danger);font-size:20px;width:30px;height:30px;border-radius:7px}
+  .item-baris .buang:hover{background:var(--danger-bg)}
+  .pengguna-baris{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .pengguna-baris .info{flex:1}
+  .pengguna-baris .nama{font-weight:600;font-size:14px;color:var(--navy)}
+  .pengguna-baris .emel{font-size:12.5px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -163,6 +225,12 @@
       <div class="cari"><span class="ikon">⌕</span><input id="cari" placeholder="Cari nama projek, sekolah, kod…" oninput="S.filter.q=this.value;renderList()"></div>
       <button class="btn btn-brass" onclick="bukaPanel(null)">+ Projek baharu</button>
     </div>
+    <div class="aksi-bar">
+      <button class="btn btn-garis btn-kecil" id="btn-pilih" onclick="togglePilih()">☐ Pilih projek</button>
+      <button class="btn btn-garis btn-kecil" onclick="rumusanBanyak()">⤓ Muat turun rumusan</button>
+      <button class="btn btn-garis btn-kecil jpn-only" onclick="mulaBentang()">▶ Mod pembentangan</button>
+      <button class="btn btn-garis btn-kecil jpn-only" onclick="bukaTetapan()">⚙ Tetapan</button>
+    </div>
     <div class="cips" id="cips"></div>
     <div class="grid" id="senarai"></div>
   </main>
@@ -172,9 +240,37 @@
 <div id="panel"><div class="panel-dalam">
   <div class="panel-head">
     <div><h2 id="panel-tajuk"></h2><div class="kod" id="panel-kod"></div></div>
+    <button class="btn btn-brass btn-kecil" id="btn-rumusan-satu" style="display:none;margin-left:auto" onclick="rumusanSatu()">⤓ Rumusan</button>
+    <button class="btn btn-garis btn-kecil" id="btn-bundle" style="display:none" onclick="bundlePenuh()">⤓ Bundle penuh</button>
     <button class="x" onclick="tutupPanel()">×</button>
   </div>
   <div class="panel-badan" id="panel-badan"></div>
+</div></div>
+
+<!-- =================== MOD PEMBENTANGAN =================== -->
+<div id="bentang">
+  <div class="bt-head">
+    <span class="wm">J3P</span>
+    <span class="ppd-tag" id="bt-ppd-tag"></span>
+    <div class="mesyuarat">
+      <input id="bt-mesyuarat" placeholder="Bil. / Tarikh Mesyuarat" style="width:210px">
+      <button class="bt-x" onclick="tutupBentang()">×</button>
+    </div>
+  </div>
+  <div class="bt-badan" id="bt-badan"></div>
+  <div class="bt-nav" id="bt-nav" style="display:none">
+    <span class="kira" id="bt-kira"></span>
+    <div class="tolak">
+      <button id="bt-prev" onclick="bentangGerak(-1)">‹ Sebelum</button>
+      <button id="bt-next" onclick="bentangGerak(1)">Seterus ›</button>
+    </div>
+  </div>
+</div>
+
+<!-- =================== PANEL TETAPAN =================== -->
+<div id="tetapan"><div class="panel-dalam">
+  <div class="panel-head"><div><h2>Tetapan Admin JPN</h2><div class="kod">Urus akaun & pilihan</div></div><button class="x" onclick="tutupTetapan()">×</button></div>
+  <div class="panel-badan" id="tetapan-badan"></div>
 </div></div>
 
 <div id="toast"></div>
@@ -192,7 +288,7 @@ const CONFIG = {
 };
 
 /* ============================ STATE ============================ */
-const S = { token:null, me:null, projek:[], ppd:[], meta:{}, filter:{q:'',status:'',keputusan:'',tahun:''}, edit:null };
+const S = { token:null, me:null, projek:[], ppd:[], meta:{}, filter:{q:'',status:'',keputusan:'',tahun:''}, edit:null, pilihMode:false, pilih:new Set(), bentang:null };
 
 /* penyimpanan selamat (localStorage + sandaran memori) */
 const store = { _m:{},
@@ -238,9 +334,11 @@ async function masukApp(){
   el('#skrin-login').style.display='none';
   el('#app').style.display='block';
   el('#me-nama').textContent=S.me.nama;
+  document.querySelectorAll('.jpn-only').forEach(e=>e.style.display=(S.me.peranan==='Admin JPN')?'':'none');
   const nppd=(S.ppd.find(p=>p.kod===S.me.ppd)||{}).nama||S.me.ppd;
   el('#me-peranan').textContent=S.me.peranan+(S.me.ppd?(' · '+(nppd||S.me.ppd)):'');
   await muatProjek();
+  document.querySelectorAll('.jpn-only').forEach(e=>e.style.display=(S.me.peranan==='Admin JPN')?'':'none');
   el('#me-peranan').textContent=S.me.peranan+(S.me.ppd?(' · '+((S.ppd.find(p=>p.kod===S.me.ppd)||{}).nama||S.me.ppd)):'');
 }
 
@@ -291,6 +389,7 @@ function renderList(){
   box.style.gridTemplateColumns='';
   box.innerHTML=senarai.map(p=>`
     <div class="kad" onclick='bukaPanel(${JSON.stringify(p.kod_projek)})'>
+      ${S.pilihMode?`<input type="checkbox" class="kad-pilih" ${S.pilih.has(p.kod_projek)?'checked':''} onclick="event.stopPropagation();togglePilihSatu(${JSON.stringify(p.kod_projek)})">`:''}
       <div class="kod">${p.kod_projek}</div>
       <h3>${escapeHtml(p.nama_projek||'(Tiada nama)')}</h3>
       <div class="sekolah">${escapeHtml(p.nama_sekolah||'')} ${p.kod_sekolah?('· '+p.kod_sekolah):''}</div>
@@ -322,6 +421,8 @@ async function bukaPanel(kod){
   else h+=`<div class="seksyen"><div class="seksyen-tajuk">Dokumen sokongan</div><div class="hint">Simpan draf dahulu untuk mula memuat naik Geran & Pelan (PDF).</div></div>`;
 
   el('#panel-badan').innerHTML=h;
+  el('#btn-rumusan-satu').style.display = p.kod_projek ? '' : 'none';
+  el('#btn-bundle').style.display = p.kod_projek ? '' : 'none';
   el('#panel').style.display='flex';
 
   // Muat maklum balas JPN + syarat pematuhan jika ada
@@ -331,6 +432,8 @@ function tutupPanel(){el('#panel').style.display='none';S.edit=null;}
 
 function borangProjek(p){
   const opt=(arr,v)=>['<option value="">— Pilih —</option>'].concat(arr.map(o=>`<option ${o===v?'selected':''}>${o}</option>`)).join('');
+  const pilJenis=(S.meta.pilihan&&S.meta.pilihan.jenis)||CONFIG.JENIS_PROJEK;
+  const pilSumber=(S.meta.pilihan&&S.meta.pilihan.sumber)||CONFIG.SUMBER_DANA;
   const ppdField = S.me.peranan==='Admin JPN'
     ? (p.kod_projek
         ? `<div class="medan"><label>PPD</label><input value="${attr(namaPPD(p.ppd))}" disabled></div>`
@@ -345,8 +448,8 @@ function borangProjek(p){
       <div class="medan"><label>Nama sekolah *</label><input id="f-nama_sekolah" value="${attr(p.nama_sekolah)}"></div>
     </div>
     <div class="dua">
-      <div class="medan"><label>Jenis projek</label><select id="f-jenis_projek">${opt(CONFIG.JENIS_PROJEK,p.jenis_projek)}</select></div>
-      <div class="medan"><label>Sumber dana</label><select id="f-sumber_dana">${opt(CONFIG.SUMBER_DANA,p.sumber_dana)}</select></div>
+      <div class="medan"><label>Jenis projek</label><select id="f-jenis_projek">${opt(pilJenis,p.jenis_projek)}</select></div>
+      <div class="medan"><label>Sumber dana</label><select id="f-sumber_dana">${opt(pilSumber,p.sumber_dana)}</select></div>
     </div>
     <div class="dua">
       <div class="medan"><label>No. rujukan geran</label><input id="f-no_rujukan_geran" value="${attr(p.no_rujukan_geran)}"></div>
@@ -487,6 +590,310 @@ async function lihatPDF(fileId){
     window.open(URL.createObjectURL(blob),'_blank');
   }catch(e){toast(e.message,true);}
 }
+
+/* ============================ PILIH PROJEK ============================ */
+function togglePilih(){
+  S.pilihMode=!S.pilihMode;
+  if(!S.pilihMode) S.pilih.clear();
+  el('#btn-pilih').innerHTML=S.pilihMode?'☒ Selesai pilih':'☐ Pilih projek';
+  renderList();
+}
+function togglePilihSatu(kod){ if(S.pilih.has(kod)) S.pilih.delete(kod); else S.pilih.add(kod); }
+
+/* ============================ RUMUSAN PDF ============================ */
+async function rumusanSatu(){
+  if(!S.edit||!S.edit.kod_projek)return;
+  let kep=[],pem=[];
+  try{const dk=await api('senaraiKeputusan',{kodProjek:S.edit.kod_projek});kep=dk.keputusan||[];}catch(e){}
+  try{const dp=await api('senaraiPematuhan',{kodProjek:S.edit.kod_projek});pem=dp.pematuhan||[];}catch(e){}
+  janaRumusan([S.edit],{[S.edit.kod_projek]:{kep,pem}},'Rumusan_'+S.edit.kod_projek);
+}
+async function rumusanBanyak(){
+  const senarai = S.pilih.size ? S.projek.filter(p=>S.pilih.has(p.kod_projek)) : tapisProjek();
+  if(!senarai.length){toast('Tiada projek untuk dimuat turun.',true);return;}
+  const nama = S.pilih.size ? ('Rumusan_Pilihan_'+senarai.length+'projek') : 'Rumusan_Semua_'+senarai.length+'projek';
+  janaRumusan(senarai,{},nama);
+}
+
+function janaRumusan(senarai,extra,namaFail){
+  const doc=binaRumusanDoc(senarai,extra);
+  doc.save((namaFail||'Rumusan_J3P')+'.pdf');
+  toast('Rumusan dimuat turun ('+senarai.length+' projek).');
+}
+
+function binaRumusanDoc(senarai,extra){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'pt',format:'a4'});
+  const W=doc.internal.pageSize.getWidth(), M=48;
+  const NAVY=[15,41,66], BRASS=[184,134,11], MUTED=[95,107,122];
+
+  senarai.forEach((p,i)=>{
+    if(i>0) doc.addPage();
+    let y=0;
+    // Kepala navy
+    doc.setFillColor(...NAVY); doc.rect(0,0,W,86,'F');
+    doc.setFillColor(...BRASS); doc.rect(0,86,W,4,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold'); doc.setFontSize(22); doc.text('J3P',M,44);
+    doc.setFont('helvetica','normal'); doc.setFontSize(10);
+    doc.text('JAWATANKUASA PELAKSANAAN PROJEK PEMBANGUNAN · JPN KEDAH',M,60);
+    doc.setFontSize(9); doc.text('Rumusan Projek',M,73);
+    doc.setFontSize(9); doc.setTextColor(220,200,150);
+    doc.text(namaPPD(p.ppd)||p.ppd||'',W-M,60,{align:'right'});
+    y=120;
+
+    doc.setTextColor(...BRASS); doc.setFont('helvetica','bold'); doc.setFontSize(10);
+    doc.text(p.kod_projek||'',M,y); y+=20;
+    doc.setTextColor(...NAVY); doc.setFontSize(16);
+    doc.text(garis(doc,p.nama_projek||'(Tiada nama)',W-2*M),M,y); y+=8;
+    doc.setDrawColor(...BRASS); doc.setLineWidth(1); doc.line(M,y,W-M,y); y+=22;
+
+    const baris=[
+      ['Sekolah',(p.nama_sekolah||'—')+(p.kod_sekolah?(' ('+p.kod_sekolah+')'):'')],
+      ['Jenis Projek',p.jenis_projek||'—'],
+      ['Sumber Dana',p.sumber_dana||'—'],
+      ['No. Rujukan Geran',p.no_rujukan_geran||'—'],
+      ['Anggaran Kos',p.anggaran_kos?('RM '+Number(p.anggaran_kos).toLocaleString('en-MY')):'—'],
+      ['Tahun',String(p.tahun||'—')],
+      ['Status',p.status||'Draf'],
+      ['Keputusan Terkini',p.keputusan_terkini||'Belum diputuskan'],
+    ];
+    doc.setFontSize(11);
+    baris.forEach(b=>{
+      doc.setFont('helvetica','normal'); doc.setTextColor(...MUTED); doc.text(b[0],M,y);
+      doc.setFont('helvetica','bold'); doc.setTextColor(30,34,49);
+      doc.text(garis(doc,String(b[1]),W-M-190),M+190,y);
+      y+=22;
+    });
+
+    const x=extra[p.kod_projek];
+    if(x){
+      if(x.kep&&x.kep.length){
+        y+=8; doc.setFont('helvetica','bold'); doc.setTextColor(...NAVY); doc.setFontSize(12);
+        doc.text('Maklum Balas J3P',M,y); y+=6; doc.setDrawColor(220,220,210); doc.line(M,y,W-M,y); y+=16;
+        x.kep.slice().reverse().forEach(k=>{
+          doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(...MUTED);
+          doc.text((k.bil_tarikh_mesyuarat||'')+'  ·  '+(k.keputusan||''),M,y); y+=15;
+          doc.setFont('helvetica','normal'); doc.setTextColor(30,34,49); doc.setFontSize(10.5);
+          const baris=doc.splitTextToSize(k.ulasan_jpn||'(Tiada ulasan)',W-2*M);
+          doc.text(baris,M,y); y+=baris.length*14+8;
+          if(y>760){doc.addPage();y=60;}
+        });
+      }
+      if(x.pem&&x.pem.length){
+        y+=6; doc.setFont('helvetica','bold'); doc.setTextColor(...NAVY); doc.setFontSize(12);
+        doc.text('Syarat Pematuhan',M,y); y+=6; doc.setDrawColor(220,220,210); doc.line(M,y,W-M,y); y+=16;
+        x.pem.forEach((s,idx)=>{
+          doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.setTextColor(30,34,49);
+          const baris=doc.splitTextToSize((idx+1)+'. '+(s.teks_syarat||''),W-2*M-90);
+          doc.text(baris,M,y);
+          doc.setFont('helvetica','bold'); doc.setTextColor(...MUTED);
+          doc.text(s.status_syarat||'',W-M,y,{align:'right'});
+          y+=Math.max(baris.length*14,16)+6;
+          if(y>760){doc.addPage();y=60;}
+        });
+      }
+    }
+
+    // Kaki
+    doc.setFontSize(8); doc.setTextColor(...MUTED);
+    doc.text('Dijana '+new Date().toLocaleString('ms-MY')+' · Sistem J3P JPN Kedah',M,822);
+    doc.text((i+1)+' / '+senarai.length,W-M,822,{align:'right'});
+  });
+
+  doc.save((namaFail||'Rumusan_J3P')+'.pdf');
+  toast('Rumusan dimuat turun ('+senarai.length+' projek).');
+}
+function garis(doc,teks,lebar){const b=doc.splitTextToSize(String(teks),lebar);return b[0]+(b.length>1?'…':'');}
+
+/* ============================ BUNDLE PENUH (pdf-lib) ============================ */
+async function bundlePenuh(){
+  const p=S.edit; if(!p||!p.kod_projek)return;
+  let kep=[],pem=[];
+  try{const dk=await api('senaraiKeputusan',{kodProjek:p.kod_projek});kep=dk.keputusan||[];}catch(e){}
+  try{const dp=await api('senaraiPematuhan',{kodProjek:p.kod_projek});pem=dp.pematuhan||[];}catch(e){}
+  const lampiran=[
+    {label:'Salinan Geran',id:extractId(p.pautan_geran)},
+    {label:'Pelan Projek',id:extractId(p.pautan_pelan)},
+    {label:'Dokumen Lain',id:extractId(p.pautan_dok_lain)},
+  ].filter(x=>x.id);
+  try{
+    el('#load').style.display='flex';
+    const { PDFDocument, StandardFonts, rgb } = PDFLib;
+    const merged = await PDFDocument.create();
+    const fontB = await merged.embedFont(StandardFonts.HelveticaBold);
+    const fontR = await merged.embedFont(StandardFonts.Helvetica);
+    // 1) Muka rekod rasmi (dijana jsPDF)
+    const coverBytes = binaRumusanDoc([p],{[p.kod_projek]:{kep,pem}}).output('arraybuffer');
+    await gabungPdf(merged, coverBytes);
+    // 2) Lampiran (setiap satu didahului muka pemisah)
+    let gagal=0;
+    for(const L of lampiran){
+      pemisahPdf(merged,fontB,fontR,rgb,L.label,p.kod_projek,p.nama_projek);
+      try{
+        const d=await api('dapatFailBase64',{fileId:L.id});
+        const bytes=Uint8Array.from(atob(d.base64),c=>c.charCodeAt(0));
+        await gabungPdf(merged,bytes);
+      }catch(e){gagal++;}
+    }
+    const out = await merged.save();
+    muatTurunBlob(out,'Bundle_'+p.kod_projek+'.pdf');
+    toast('Bundle penuh dimuat turun'+(lampiran.length?(gagal?(' ('+gagal+' lampiran gagal)'):''):' (tiada lampiran)')+'.');
+  }catch(e){toast('Gagal bina bundle: '+e.message,true);}
+  finally{el('#load').style.display='none';}
+}
+async function gabungPdf(merged,bytes){
+  const src=await PDFLib.PDFDocument.load(bytes,{ignoreEncryption:true});
+  const pages=await merged.copyPages(src,src.getPageIndices());
+  pages.forEach(pg=>merged.addPage(pg));
+}
+function pemisahPdf(merged,fontB,fontR,rgb,label,kod,nama){
+  const H=841.89,Wd=595.28;
+  const page=merged.addPage([Wd,H]);
+  page.drawRectangle({x:0,y:H-96,width:Wd,height:96,color:rgb(0.059,0.161,0.259)});
+  page.drawRectangle({x:0,y:H-100,width:Wd,height:4,color:rgb(0.722,0.525,0.043)});
+  page.drawText('LAMPIRAN',{x:48,y:H-52,size:12,font:fontR,color:rgb(0.85,0.78,0.55)});
+  page.drawText(label,{x:48,y:H-80,size:24,font:fontB,color:rgb(1,1,1)});
+  page.drawText(kod,{x:48,y:H-150,size:11,font:fontR,color:rgb(0.37,0.42,0.48)});
+  const tajuk=(nama||'').slice(0,70);
+  page.drawText(tajuk,{x:48,y:H-170,size:13,font:fontB,color:rgb(0.06,0.16,0.26)});
+}
+function muatTurunBlob(bytes,nama){
+  const blob=new Blob([bytes],{type:'application/pdf'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nama;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+
+/* ============================ MOD PEMBENTANGAN ============================ */
+function mulaBentang(){
+  el('#bentang').style.display='flex';
+  el('#bt-nav').style.display='none';
+  el('#bt-ppd-tag').textContent='';
+  let h='<div class="bt-pilih-ppd"><div><div style="font-family:Fraunces,serif;font-size:26px;margin-bottom:6px">Pilih PPD untuk dibentangkan</div><div style="opacity:.7">Projek akan dipaparkan satu demi satu untuk mesyuarat J3P.</div></div><div class="grid-ppd">';
+  h+=`<button onclick="bentangPPD('')">Semua PPD</button>`;
+  S.ppd.forEach(p=>{const bil=S.projek.filter(x=>x.ppd===p.kod).length;h+=`<button onclick="bentangPPD('${p.kod}')">${escapeHtml(p.nama)}<br><span class="bt-badge" style="margin-top:6px;display:inline-block">${bil} projek</span></button>`;});
+  h+='</div></div>';
+  el('#bt-badan').innerHTML=h;
+}
+function bentangPPD(ppdKod){
+  let senarai = ppdKod ? S.projek.filter(p=>p.ppd===ppdKod) : S.projek.slice();
+  senarai.sort((a,b)=>String(a.kod_projek).localeCompare(String(b.kod_projek)));
+  if(!senarai.length){toast('Tiada projek untuk PPD ini.',true);return;}
+  S.bentang={senarai,idx:0,ppd:ppdKod};
+  el('#bt-ppd-tag').textContent=ppdKod?(namaPPD(ppdKod)):'Semua PPD';
+  el('#bt-nav').style.display='flex';
+  renderBentang();
+}
+async function renderBentang(){
+  const b=S.bentang; const p=b.senarai[b.idx];
+  el('#bt-kira').textContent=`Projek ${b.idx+1} / ${b.senarai.length}`;
+  el('#bt-prev').disabled=b.idx===0;
+  el('#bt-next').disabled=b.idx===b.senarai.length-1;
+  const info=(k,v)=>`<div class="bt-info"><span class="k">${k}</span><span class="v">${escapeHtml(v||'—')}</span></div>`;
+  const dokBtn=(label,pautan)=>pautan?`<button class="btn btn-kecil" onclick="lihatPDF('${extractId(pautan)}')">${label}</button>`:`<button class="btn btn-kecil tiada">${label} (tiada)</button>`;
+  el('#bt-badan').innerHTML=`<div class="bt-kad">
+    <div class="bt-kod">${p.kod_projek} · ${escapeHtml(namaPPD(p.ppd))}</div>
+    <div class="bt-nama">${escapeHtml(p.nama_projek||'(Tiada nama)')}</div>
+    <div class="bt-sekolah">${escapeHtml(p.nama_sekolah||'')} ${p.kod_sekolah?('· '+p.kod_sekolah):''}</div>
+    <div class="bt-kotak"><h4>Butiran projek</h4><div class="bt-grid">
+      ${info('Jenis projek',p.jenis_projek)}${info('Sumber dana',p.sumber_dana)}
+      ${info('No. rujukan geran',p.no_rujukan_geran)}${info('Anggaran kos',p.anggaran_kos?('RM '+Number(p.anggaran_kos).toLocaleString('en-MY')):'—')}
+      ${info('Tahun',p.tahun)}${info('Status',p.status)}
+    </div></div>
+    <div class="bt-kotak"><h4>Dokumen sokongan</h4><div class="bt-dok">
+      ${dokBtn('Lihat Geran',p.pautan_geran)}${dokBtn('Lihat Pelan',p.pautan_pelan)}${dokBtn('Dokumen Lain',p.pautan_dok_lain)}
+    </div></div>
+    <div class="bt-kotak" id="bt-maklum"><h4>Maklum balas & keputusan terdahulu</h4><div id="bt-maklum-isi" style="opacity:.7">Memuatkan…</div></div>
+    <div class="bt-kotak"><h4>Rekod keputusan J3P ${p.keputusan_terkini?('· terkini: '+p.keputusan_terkini):''}</h4>
+      <textarea class="bt-ulasan" id="bt-ulasan" placeholder="Ulasan Jawatankuasa…"></textarea>
+      <div class="bt-kep" id="bt-kep">${(S.meta.keputusan||[]).map(k=>`<button data-k="${k}" onclick="bentangPilihKep(this,'${k}')">${k}</button>`).join('')}</div>
+      <div id="bt-syarat-wrap" style="display:none">
+        <div style="font-size:13px;opacity:.8;margin-bottom:6px">Syarat (satu baris satu syarat):</div>
+        <div id="bt-syarat-list"></div>
+        <button class="btn btn-kecil" style="background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25)" onclick="tambahBarisSyarat()">+ Tambah syarat</button>
+      </div>
+      <div style="margin-top:14px"><button class="btn btn-brass" onclick="bentangSimpan()">Simpan keputusan</button></div>
+    </div>
+  </div>`;
+  S.bentang.keputusanDipilih=null;
+  muatMaklumBentang(p.kod_projek);
+}
+async function muatMaklumBentang(kod){
+  try{
+    const dk=await api('senaraiKeputusan',{kodProjek:kod});
+    const dp=await api('senaraiPematuhan',{kodProjek:kod});
+    let h='';
+    if((dk.keputusan||[]).length){(dk.keputusan||[]).slice().reverse().forEach(k=>{h+=`<div class="bt-info"><span class="k">${escapeHtml(k.bil_tarikh_mesyuarat||'')} · ${escapeHtml(k.keputusan||'')}</span><span class="v" style="max-width:60%">${escapeHtml(k.ulasan_jpn||'')}</span></div>`;});}
+    if((dp.pematuhan||[]).length){h+='<div style="margin-top:10px;font-size:13px;opacity:.8">Syarat pematuhan:</div>';(dp.pematuhan||[]).forEach(s=>{h+=`<div class="bt-info"><span class="k">${escapeHtml(s.teks_syarat||'')}</span><span class="v">${escapeHtml(s.status_syarat||'')}</span></div>`;});}
+    el('#bt-maklum-isi').innerHTML=h||'<span style="opacity:.6">Belum ada rekod keputusan.</span>';
+    el('#bt-maklum-isi').style.opacity='1';
+  }catch(e){el('#bt-maklum-isi').innerHTML='<span style="opacity:.6">—</span>';}
+}
+function bentangPilihKep(btn,k){
+  document.querySelectorAll('#bt-kep button').forEach(b=>b.classList.remove('pilih'));
+  btn.classList.add('pilih'); S.bentang.keputusanDipilih=k;
+  const wrap=el('#bt-syarat-wrap');
+  if(k==='Lulus Bersyarat'){wrap.style.display='block';if(!el('#bt-syarat-list').children.length)tambahBarisSyarat();}
+  else wrap.style.display='none';
+}
+function tambahBarisSyarat(){const d=document.createElement('input');d.className='bt-syarat-input';d.placeholder='Nyatakan syarat…';el('#bt-syarat-list').appendChild(d);}
+async function bentangSimpan(){
+  const b=S.bentang; const p=b.senarai[b.idx];
+  const keputusan=b.keputusanDipilih;
+  if(!keputusan){toast('Sila pilih keputusan.',true);return;}
+  const payload={kodProjek:p.kod_projek,keputusan,ulasan:el('#bt-ulasan').value.trim(),bilTarikhMesyuarat:el('#bt-mesyuarat').value.trim()};
+  if(keputusan==='Lulus Bersyarat'){payload.syarat=[...document.querySelectorAll('#bt-syarat-list input')].map(i=>i.value.trim()).filter(Boolean);if(!payload.syarat.length){toast('Sila nyatakan sekurang-kurangnya satu syarat.',true);return;}}
+  try{
+    await api('rekodKeputusan',payload);
+    toast('Keputusan direkod: '+keputusan);
+    await muatProjek();
+    // kemas kini objek dalam senarai bentang
+    const fresh=S.projek.find(x=>x.kod_projek===p.kod_projek); if(fresh)b.senarai[b.idx]=fresh;
+    if(b.idx<b.senarai.length-1){b.idx++;renderBentang();}else renderBentang();
+  }catch(e){toast(e.message,true);}
+}
+function bentangGerak(d){const b=S.bentang;const n=b.idx+d;if(n<0||n>=b.senarai.length)return;b.idx=n;renderBentang();}
+function tutupBentang(){el('#bentang').style.display='none';S.bentang=null;}
+
+/* ============================ PANEL TETAPAN ============================ */
+async function bukaTetapan(){
+  el('#tetapan').style.display='flex';
+  el('#tetapan-badan').innerHTML='<div style="text-align:center;padding:30px;color:var(--muted)">Memuatkan…</div>';
+  let pengguna=[];
+  try{const d=await api('senaraiPengguna');pengguna=d.pengguna||[];}catch(e){}
+  const pil=S.meta.pilihan||{jenis:[],sumber:[]};
+  const senaraiItem=(arr,jenis)=>arr.map((v,i)=>`<div class="item-baris"><input value="${attr(v)}" data-jenis="${jenis}"><button class="buang" onclick="this.parentElement.remove()">×</button></div>`).join('');
+  el('#tetapan-badan').innerHTML=`
+    <div class="seksyen"><div class="seksyen-tajuk">Reset kata laluan Admin PPD</div>
+      <div id="senarai-pengguna">${pengguna.length?pengguna.map(u=>`
+        <div class="pengguna-baris"><div class="info"><div class="nama">${escapeHtml(u.nama)}</div><div class="emel">${escapeHtml(u.emel)} · ${escapeHtml(namaPPD(u.ppd))}</div></div>
+        <button class="btn btn-garis btn-kecil" onclick="resetPPD('${escapeHtml(u.emel)}')">Reset kata laluan</button></div>`).join(''):'<div class="hint">Belum ada akaun Admin PPD. Jalankan ciptaSemuaAdminPPD() dalam GAS.</div>'}</div>
+    </div>
+    <div class="seksyen"><div class="seksyen-tajuk">Jenis Projek</div>
+      <div id="list-jenis">${senaraiItem(pil.jenis||[],'jenis')}</div>
+      <button class="btn btn-garis btn-kecil" style="margin-top:8px" onclick="tambahItem('jenis')">+ Tambah jenis</button>
+    </div>
+    <div class="seksyen"><div class="seksyen-tajuk">Sumber Dana</div>
+      <div id="list-sumber">${senaraiItem(pil.sumber||[],'sumber')}</div>
+      <button class="btn btn-garis btn-kecil" style="margin-top:8px" onclick="tambahItem('sumber')">+ Tambah sumber</button>
+    </div>
+    <div class="aksi-panel"><button class="btn btn-brass" onclick="simpanPilihan()">Simpan pilihan</button></div>`;
+}
+function tambahItem(jenis){const wrap=el(jenis==='jenis'?'#list-jenis':'#list-sumber');const d=document.createElement('div');d.className='item-baris';d.innerHTML=`<input data-jenis="${jenis}" placeholder="Item baharu…"><button class="buang" onclick="this.parentElement.remove()">×</button>`;wrap.appendChild(d);}
+async function resetPPD(emel){
+  const kl=prompt('Kata laluan baharu untuk '+emel+' (min. 6 aksara):');
+  if(kl===null)return;
+  if(kl.length<6){toast('Kata laluan terlalu pendek.',true);return;}
+  try{await api('resetKataLaluanPPD',{emel,kataLaluanBaharu:kl});toast('Kata laluan '+emel+' direset.');}
+  catch(e){toast(e.message,true);}
+}
+async function simpanPilihan(){
+  const jenis=[...document.querySelectorAll('#list-jenis input')].map(i=>i.value.trim()).filter(Boolean);
+  const sumber=[...document.querySelectorAll('#list-sumber input')].map(i=>i.value.trim()).filter(Boolean);
+  try{const d=await api('simpanPilihan',{jenis,sumber});S.meta.pilihan=d.pilihan;toast('Pilihan disimpan.');tutupTetapan();}
+  catch(e){toast(e.message,true);}
+}
+function tutupTetapan(){el('#tetapan').style.display='none';}
 
 /* ============================ UTIL ============================ */
 function val(id){const e=document.getElementById(id);return e?e.value.trim():'';}
